@@ -26,7 +26,17 @@
 #else
 # include <errno.h>
 # include <fcntl.h>
-# include <sys/mman.h>      // mmap, munmap.
+# ifdef __SWITCH__
+#  define PROT_READ 0
+#  define PROT_WRITE 1
+#  define MAP_PRIVATE 2
+#  define MAP_SHARED 4
+#  define MAP_FAILED (void*)-1
+extern "C" void * mmap(void *start, size_t length, int prot , int flags, int fd, off_t offset) { return MAP_FAILED; }
+extern "C" int munmap(void *start, size_t length) { return -1; }
+# else
+#  include <sys/mman.h>      // mmap, munmap.
+# endif // __SWITCH__
 # include <sys/stat.h>
 # include <sys/types.h>     // struct stat.
 # include <unistd.h>        // sysconf.
